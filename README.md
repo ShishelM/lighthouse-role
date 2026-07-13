@@ -1,38 +1,48 @@
-Role Name
-=========
+LightHouse Ansible Role
+=======================
 
-A brief description of the role goes here.
+Ansible-роль для развёртывания легковесного веб-интерфейса [LightHouse](https://github.com) для СУБД ClickHouse. Роль автоматически устанавливает веб-сервер Nginx, клонирует исходный код UI от команды VK и настраивает виртуальный хост.
 
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+* Операционная система: Ubuntu 22.04 / 24.04 (или другие Debian-подобные дистрибутивы).
+* Наличие установленной СУБД ClickHouse в инфраструктуре (интерфейс подключается к ней через веб-браузер пользователя).
+* Наличие прав `sudo` (become: true) у запускающего пользователя.
 
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+Доступные для переопределения переменные находятся в файле `defaults/main.yml`:
+
+* `lighthouse_web_dir`: Путь на целевом хосте, куда будут скопированы статические файлы веб-интерфейса (по умолчанию: `/var/www/lighthouse`).
+* `lighthouse_vhost_port`: Порт, на котором Nginx будет обслуживать веб-интерфейс LightHouse (по умолчанию: `80`).
 
 Dependencies
 ------------
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+Прямых зависимостей от других ролей Ansible Galaxy нет. Однако для полноценной работы интерфейса требуется предварительно развернутый инстанс Clickhouse (может быть установлен на этом же хосте или доступен по сети).
 
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+Пример использования роли для развёртывания веб-интерфейса на нестандартном порту:
 
-    - hosts: servers
+    - hosts: web_servers
+      become: true
       roles:
-         - { role: username.rolename, x: 42 }
+         - role: lighthouse-role
+           vars:
+             lighthouse_web_dir: "/var/www/clickhouse_ui"
+             lighthouse_vhost_port: "8080"
 
 License
 -------
 
-BSD
+MIT
 
 Author Information
 ------------------
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+Роль разработана в рамках выполнения практической работы курса DevOps.
+Автор: Pavel (https://github.com)

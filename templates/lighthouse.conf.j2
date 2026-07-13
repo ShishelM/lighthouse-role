@@ -1,0 +1,11 @@
+server {
+    listen {{ lighthouse_vhost_port }} default_server;
+    server_name localhost;
+
+    root {{ lighthouse_web_dir }};
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}

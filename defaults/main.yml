@@ -1,0 +1,3 @@
+---
+lighthouse_web_dir: "/var/www/lighthouse"
+lighthouse_vhost_port: "80"

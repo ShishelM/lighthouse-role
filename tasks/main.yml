@@ -1,0 +1,45 @@
+---
+- name: Install Nginx web server and git
+  ansible.builtin.apt:
+    name:
+      - nginx
+      - git
+    state: present
+    update_cache: true
+
+- name: Create directory for LightHouse static website files
+  ansible.builtin.file:
+    path: "{{ lighthouse_web_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Clear target web directory before clone
+  ansible.builtin.file:
+    path: "{{ lighthouse_web_dir }}"
+    state: absent
+
+- name: Clone LightHouse repository via git module
+  ansible.builtin.git:
+    repo: 'https://github.com/VKCOM/lighthouse.git'
+    dest: "{{ lighthouse_web_dir }}"
+    version: master
+    depth: 1
+
+- name: Configure Nginx virtual host for LightHouse from template
+  ansible.builtin.template:
+    src: lighthouse.conf.j2
+    dest: /etc/nginx/sites-available/lighthouse.conf
+    mode: '0644'
+  notify: Restart nginx service
+
+- name: Enable LightHouse Nginx configuration website link
+  ansible.builtin.file:
+    src: /etc/nginx/sites-available/lighthouse.conf
+    dest: /etc/nginx/sites-enabled/lighthouse.conf
+    state: link
+
+- name: Remove default Nginx site configuration to avoid port conflicts
+  ansible.builtin.file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  notify: Restart nginx service
